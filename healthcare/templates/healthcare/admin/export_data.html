@@ -1,0 +1,261 @@
+{% extends 'healthcare/base.html' %}
+{% load static %}
+
+{% block title %}Export Data - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="export-container">
+    <div class="page-header">
+        <h1><i class="fas fa-download"></i> Export Data</h1>
+        <p>Export your healthcare platform data in various formats</p>
+    </div>
+
+    <!-- Export Options -->
+    <div class="export-options">
+        <div class="export-card">
+            <h3><i class="fas fa-users"></i> User Data</h3>
+            <p>Export all user information including patients and doctors</p>
+            <div class="export-formats">
+                <button class="btn btn-primary" onclick="exportData('users', 'csv')">CSV</button>
+                <button class="btn btn-primary" onclick="exportData('users', 'excel')">Excel</button>
+                <button class="btn btn-primary" onclick="exportData('users', 'json')">JSON</button>
+            </div>
+        </div>
+
+        <div class="export-card">
+            <h3><i class="fas fa-calendar-alt"></i> Appointment Data</h3>
+            <p>Export all appointment records and booking information</p>
+            <div class="export-formats">
+                <button class="btn btn-primary" onclick="exportData('appointments', 'csv')">CSV</button>
+                <button class="btn btn-primary" onclick="exportData('appointments', 'excel')">Excel</button>
+                <button class="btn btn-primary" onclick="exportData('appointments', 'json')">JSON</button>
+            </div>
+        </div>
+
+        <div class="export-card">
+            <h3><i class="fas fa-file-medical"></i> Medical Records</h3>
+            <p>Export patient medical history and treatment records</p>
+            <div class="export-formats">
+                <button class="btn btn-primary" onclick="exportData('medical', 'csv')">CSV</button>
+                <button class="btn btn-primary" onclick="exportData('medical', 'excel')">Excel</button>
+                <button class="btn btn-primary" onclick="exportData('medical', 'json')">JSON</button>
+            </div>
+        </div>
+
+        <div class="export-card">
+            <h3><i class="fas fa-chart-line"></i> Analytics Data</h3>
+            <p>Export system analytics and performance metrics</p>
+            <div class="export-formats">
+                <button class="btn btn-primary" onclick="exportData('analytics', 'csv')">CSV</button>
+                <button class="btn btn-primary" onclick="exportData('analytics', 'excel')">Excel</button>
+                <button class="btn btn-primary" onclick="exportData('analytics', 'json')">JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Export -->
+    <div class="custom-export">
+        <h2>Custom Export</h2>
+        <div class="export-form">
+            <div class="form-group">
+                <label>Select Data Type</label>
+                <select id="dataType" class="form-select">
+                    <option value="users">Users</option>
+                    <option value="appointments">Appointments</option>
+                    <option value="medical">Medical Records</option>
+                    <option value="analytics">Analytics</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Select Date Range</label>
+                <div class="date-range">
+                    <input type="date" id="exportStartDate" class="form-input">
+                    <span>to</span>
+                    <input type="date" id="exportEndDate" class="form-input">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Select Format</label>
+                <select id="exportFormat" class="form-select">
+                    <option value="csv">CSV</option>
+                    <option value="excel">Excel</option>
+                    <option value="json">JSON</option>
+                    <option value="pdf">PDF</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="customExport()">
+                <i class="fas fa-download"></i> Export Data
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.export-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #6b7280;
+    font-size: 1.125rem;
+}
+
+.export-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.export-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.export-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.export-card p {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.export-formats {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.custom-export {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.custom-export h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.export-form {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-select,
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-range span {
+    color: #6b7280;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .export-container {
+        padding: 1rem;
+    }
+    
+    .export-formats {
+        flex-direction: column;
+    }
+    
+    .date-range {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+
+<script>
+// Export functionality
+function exportData(dataType, format) {
+    alert(`Exporting ${dataType} data in ${format} format`);
+}
+
+function customExport() {
+    const dataType = document.getElementById('dataType').value;
+    const startDate = document.getElementById('exportStartDate').value;
+    const endDate = document.getElementById('exportEndDate').value;
+    const format = document.getElementById('exportFormat').value;
+    
+    if (!startDate || !endDate) {
+        alert('Please select a date range');
+        return;
+    }
+    
+    alert(`Exporting ${dataType} data from ${startDate} to ${endDate} in ${format} format`);
+}
+
+// Set default dates
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    document.getElementById('exportStartDate').value = startDate.toISOString().split('T')[0];
+    document.getElementById('exportEndDate').value = today.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

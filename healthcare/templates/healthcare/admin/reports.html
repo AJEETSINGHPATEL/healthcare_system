@@ -1,0 +1,527 @@
+{% extends 'healthcare/base.html' %}
+{% load static %}
+
+{% block title %}Reports - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div class="col-12">
+            <div class="reports-container">
+                <!-- Header with modern design -->
+                <div class="reports-header">
+                    <div class="header-content">
+                        <div class="header-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="header-text">
+                            <h1 class="mb-1">Reports & Analytics</h1>
+                            <p class="mb-0 text-muted">Comprehensive insights into your healthcare system</p>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <div class="date-range-selector">
+                            <label for="dateRange" class="form-label small mb-1">Report Period</label>
+                            <select class="form-select form-select-sm" id="dateRange">
+                                <option value="7">Last 7 days</option>
+                                <option value="30" selected>Last 30 days</option>
+                                <option value="90">Last 3 months</option>
+                                <option value="365">Last year</option>
+                                <option value="custom">Custom range</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Nav tabs -->
+                <ul class="nav nav-tabs modern-tabs px-4" id="reportsTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="user-reports-tab" data-bs-toggle="tab" data-bs-target="#user-reports" type="button" role="tab" aria-controls="user-reports" aria-selected="true">
+                            <div class="tab-content-wrapper">
+                                <i class="fas fa-users"></i>
+                                <span>User Reports</span>
+                                <div class="tab-indicator"></div>
+                            </div>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="appointment-reports-tab" data-bs-toggle="tab" data-bs-target="#appointment-reports" type="button" role="tab" aria-controls="appointment-reports" aria-selected="false">
+                            <div class="tab-content-wrapper">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Appointment Reports</span>
+                                <div class="tab-indicator"></div>
+                            </div>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="financial-reports-tab" data-bs-toggle="tab" data-bs-target="#financial-reports" type="button" role="tab" aria-controls="financial-reports" aria-selected="false">
+                            <div class="tab-content-wrapper">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Financial Reports</span>
+                                <div class="tab-indicator"></div>
+                            </div>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="system-reports-tab" data-bs-toggle="tab" data-bs-target="#system-reports" type="button" role="tab" aria-controls="system-reports" aria-selected="false">
+                            <div class="tab-content-wrapper">
+                                <i class="fas fa-server"></i>
+                                <span>System Reports</span>
+                                <div class="tab-indicator"></div>
+                            </div>
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Loading indicator -->
+                <div class="tab-loading-indicator" id="tabLoading" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span class="ms-2">Loading report data...</span>
+                </div>
+
+                <!-- Enhanced Tab panes -->
+                <div class="tab-content" id="reportsTabContent">
+                    <div class="tab-pane fade show active" id="user-reports" role="tabpanel" aria-labelledby="user-reports-tab">
+                        <div class="tab-content-wrapper">
+                            {% include 'healthcare/admin/user_reports.html' %}
+                            <div class="text-center mt-4 pb-4">
+                                <button class="btn btn-danger btn-lg download-btn" onclick="downloadReport('user')">
+                                    <i class="fas fa-file-pdf"></i> Download User Report PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="appointment-reports" role="tabpanel" aria-labelledby="appointment-reports-tab">
+                        <div class="tab-content-wrapper">
+                            {% include 'healthcare/admin/appointment_reports.html' %}
+                            <div class="text-center mt-4 pb-4">
+                                <button class="btn btn-danger btn-lg download-btn" onclick="downloadReport('appointment')">
+                                    <i class="fas fa-file-pdf"></i> Download Appointment Report PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="financial-reports" role="tabpanel" aria-labelledby="financial-reports-tab">
+                        <div class="tab-content-wrapper">
+                            {% include 'healthcare/admin/financial_reports.html' %}
+                            <div class="text-center mt-4 pb-4">
+                                <button class="btn btn-danger btn-lg download-btn" onclick="downloadReport('financial')">
+                                    <i class="fas fa-file-pdf"></i> Download Financial Report PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="system-reports" role="tabpanel" aria-labelledby="system-reports-tab">
+                        <div class="tab-content-wrapper">
+                            {% include 'healthcare/admin/system_reports.html' %}
+                            <div class="text-center mt-4 pb-4">
+                                <button class="btn btn-danger btn-lg download-btn" onclick="downloadReport('system')">
+                                    <i class="fas fa-file-pdf"></i> Download System Report PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Full screen reports styling */
+.reports-container {
+    min-height: calc(100vh - 200px); /* Full viewport height minus header/footer */
+    background: #f8f9fa;
+}
+
+/* Modern Header Styles */
+.reports-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 2rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-icon {
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.header-text h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    align-items: flex-end;
+}
+
+.date-range-selector {
+    background: rgba(255,255,255,0.1);
+    padding: 0.75rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.date-range-selector .form-select {
+    background: rgba(255,255,255,0.9);
+    border: none;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Modern Tabs */
+.modern-tabs {
+    border-bottom: none;
+    background: white;
+    margin-bottom: 0;
+    padding: 0 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.modern-tabs .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    background: transparent;
+}
+
+.modern-tabs .nav-link .tab-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modern-tabs .nav-link .tab-indicator {
+    width: 0;
+    height: 3px;
+    background: #007bff;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+.modern-tabs .nav-link:hover {
+    color: #007bff;
+    background: rgba(0, 123, 255, 0.05);
+}
+
+.modern-tabs .nav-link:hover .tab-indicator {
+    width: 60%;
+}
+
+.modern-tabs .nav-link.active {
+    color: #007bff;
+    background: white;
+    font-weight: 600;
+}
+
+.modern-tabs .nav-link.active .tab-indicator {
+    width: 100%;
+}
+
+/* Loading Indicator */
+.tab-loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Enhanced Tab Content */
+.tab-content {
+    background: white;
+    min-height: calc(100vh - 300px);
+    border: 1px solid #dee2e6;
+    border-top: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.tab-content-wrapper {
+    padding: 2rem;
+    min-height: calc(100vh - 350px);
+}
+
+/* Download Button Enhancement */
+.download-btn {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    background: linear-gradient(135deg, #c82333 0%, #a02622 100%);
+}
+
+.download-btn i {
+    margin-right: 0.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .reports-container {
+        min-height: calc(100vh - 150px);
+    }
+
+    .reports-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .header-text h1 {
+        font-size: 1.5rem;
+    }
+
+    .modern-tabs .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .tab-content-wrapper {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .modern-tabs {
+        padding: 0 1rem;
+    }
+
+    .modern-tabs .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .tab-content-wrapper {
+        padding: 0.75rem;
+    }
+
+    .header-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Custom scrollbar for better UX */
+.tab-content-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tab-content-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.tab-content-wrapper::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.tab-content-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+</style>
+
+<script>
+// Global variables
+let currentReportType = 'user';
+let currentDateRange = 30;
+
+// Enhanced download function with loading state
+function downloadReport(reportType) {
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+
+    // Show loading state
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+    button.disabled = true;
+
+    // Simulate PDF generation delay (in real app, this would be the actual download)
+    setTimeout(() => {
+        // Redirect to download URL
+        window.location.href = `{% url 'healthcare:download_pdf' 'user' %}`.replace('user', reportType);
+
+        // Reset button state
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, 2000);
+    }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tabs with enhanced functionality
+    var triggerTabList = [].slice.call(document.querySelectorAll('#reportsTab button'));
+    triggerTabList.forEach(function (triggerEl) {
+        var tabTrigger = new bootstrap.Tab(triggerEl);
+
+        triggerEl.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            // Show loading indicator
+            const loadingIndicator = document.getElementById('tabLoading');
+            loadingIndicator.style.display = 'flex';
+
+            // Hide loading after a short delay
+            setTimeout(() => {
+                loadingIndicator.style.display = 'none';
+                tabTrigger.show();
+            }, 300);
+        });
+    });
+
+    // Add smooth scrolling and animations to tab content
+    document.querySelectorAll('.nav-link').forEach(function(tab) {
+        tab.addEventListener('shown.bs.tab', function (e) {
+            // Update current report type
+            const targetId = e.target.getAttribute('data-bs-target');
+            currentReportType = targetId.replace('#', '').replace('-reports', '');
+
+            // Scroll to top of tab content with smooth animation
+            const tabContent = document.querySelector('.tab-content');
+            tabContent.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+            // Add fade-in animation to tab content
+            const activeTab = document.querySelector(targetId);
+            if (activeTab) {
+                activeTab.classList.add('fade-in');
+            }
+        });
+    });
+
+    // Date range selector functionality
+    const dateRangeSelect = document.getElementById('dateRange');
+    if (dateRangeSelect) {
+        dateRangeSelect.addEventListener('change', function() {
+            currentDateRange = this.value;
+
+            if (this.value === 'custom') {
+                // Show custom date picker (placeholder for future implementation)
+                alert('Custom date range picker will be implemented here');
+                this.value = '30'; // Reset to default
+                currentDateRange = 30;
+            } else {
+                // Show loading and refresh data (placeholder for AJAX call)
+                const loadingIndicator = document.getElementById('tabLoading');
+                loadingIndicator.style.display = 'flex';
+                loadingIndicator.querySelector('span').textContent = 'Refreshing data...';
+
+                setTimeout(() => {
+                    loadingIndicator.style.display = 'none';
+                    // In real implementation, make AJAX call to refresh data
+                    console.log(`Refreshing data for date range: ${currentDateRange} days`);
+                }, 1500);
+            }
+        });
+    }
+
+    // Add keyboard navigation for tabs
+    document.addEventListener('keydown', function(e) {
+        const activeTab = document.querySelector('.nav-link.active');
+        const allTabs = Array.from(document.querySelectorAll('.nav-link'));
+        const currentIndex = allTabs.indexOf(activeTab);
+
+        if (e.key === 'ArrowLeft' && currentIndex > 0) {
+            e.preventDefault();
+            allTabs[currentIndex - 1].click();
+        } else if (e.key === 'ArrowRight' && currentIndex < allTabs.length - 1) {
+            e.preventDefault();
+            allTabs[currentIndex + 1].click();
+        }
+    });
+
+    // Handle window resize for responsive design
+    window.addEventListener('resize', function() {
+        // Force tab content to recalculate height
+        var tabContent = document.querySelector('.tab-content');
+        if (tabContent) {
+            tabContent.style.minHeight = 'calc(100vh - 300px)';
+        }
+    });
+
+    // Add tooltips to interactive elements
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Add click tracking for analytics (placeholder)
+    document.querySelectorAll('.nav-link').forEach(function(tab, index) {
+        tab.addEventListener('click', function() {
+            console.log(`Tab clicked: ${this.textContent.trim()}, Index: ${index}`);
+            // In real implementation, send analytics data
+        });
+    });
+
+    // Initialize with fade-in animation
+    setTimeout(() => {
+        document.querySelector('.reports-container').classList.add('fade-in');
+    }, 100);
+});
+</script>
+{% endblock %}

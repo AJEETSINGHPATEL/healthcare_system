@@ -1,0 +1,75 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Patient Details - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Patient Details</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>{{ patient.full_name }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {% if patient.profile_picture %}
+                                <img src="{{ patient.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded">
+                            {% else %}
+                                <div class="bg-light border rounded p-5 text-center">
+                                    <i class="fas fa-user fa-3x text-muted"></i>
+                                    <p class="mt-2">No profile picture</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>Username:</th>
+                                    <td>{{ patient.user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email:</th>
+                                    <td>{{ patient.user.email }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date of Birth:</th>
+                                    <td>{{ patient.date_of_birth|default:"Not provided" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Phone:</th>
+                                    <td>{{ patient.phone|default:"Not provided" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Address:</th>
+                                    <td>{{ patient.address }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h4>Medical Information</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h5>Medical History</h5>
+                        <p>{{ patient.medical_history|default:"No medical history provided" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <a href="{% url 'healthcare:dashboard' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

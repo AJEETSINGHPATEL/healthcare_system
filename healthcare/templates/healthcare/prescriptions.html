@@ -1,0 +1,55 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Prescriptions - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-prescription-bottle-alt text-primary"></i> Prescriptions
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Prescription management functionality will be available soon.
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">New Prescription</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Create a new prescription for your patient.</p>
+                                    <button class="btn btn-primary" disabled>Create Prescription</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Prescription History</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>View and manage prescription history.</p>
+                                    <button class="btn btn-info" disabled>View History</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'healthcare:doctor_dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

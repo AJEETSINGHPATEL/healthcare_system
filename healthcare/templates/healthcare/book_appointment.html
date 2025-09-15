@@ -1,0 +1,31 @@
+{% extends 'healthcare/base.html' %}
+{% load static %}
+
+{% block title %}Book Appointment - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-calendar-plus text-success"></i> Schedule Appointment
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'healthcare:book_appointment' %}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-calendar-check"></i> Book Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

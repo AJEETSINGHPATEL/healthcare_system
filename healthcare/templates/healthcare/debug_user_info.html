@@ -1,0 +1,119 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Debug User Info - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-bug"></i> Debug User Information</h3>
+                </div>
+                <div class="card-body">
+                    <h4>Basic User Information</h4>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Username:</th>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>First Name:</th>
+                            <td>{{ user.first_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Last Name:</th>
+                            <td>{{ user.last_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Is Authenticated:</th>
+                            <td>{{ is_authenticated }}</td>
+                        </tr>
+                        <tr>
+                            <th>Is Staff:</th>
+                            <td>{{ is_staff }}</td>
+                        </tr>
+                        <tr>
+                            <th>Is Superuser:</th>
+                            <td>{{ is_superuser }}</td>
+                        </tr>
+                        <tr>
+                            <th>User Type Detected:</th>
+                            <td>{{ user_type|default:"Unknown" }}</td>
+                        </tr>
+                    </table>
+
+                    <h4>Profile Information</h4>
+                    {% if patient_profile %}
+                        <div class="alert alert-info">
+                            <h5>Patient Profile Found</h5>
+                            <p><strong>Phone:</strong> {{ patient_profile.phone|default:"Not provided" }}</p>
+                            <p><strong>Date of Birth:</strong> {{ patient_profile.date_of_birth|default:"Not provided" }}</p>
+                            <p><strong>Medical History:</strong> {{ patient_profile.medical_history|default:"Not provided" }}</p>
+                            <p><strong>Address:</strong> {{ patient_profile.address }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if doctor_profile %}
+                        <div class="alert alert-success">
+                            <h5>Doctor Profile Found</h5>
+                            <p><strong>Specialization:</strong> {{ doctor_profile.specialization|default:"Not provided" }}</p>
+                            <p><strong>License Number:</strong> {{ doctor_profile.license_number|default:"Not provided" }}</p>
+                            <p><strong>Experience Years:</strong> {{ doctor_profile.experience_years|default:"Not provided" }}</p>
+                            <p><strong>Phone:</strong> {{ doctor_profile.phone|default:"Not provided" }}</p>
+                            <p><strong>Address:</strong> {{ doctor_profile.address }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if admin_profile %}
+                        <div class="alert alert-warning">
+                            <h5>Admin Profile Found</h5>
+                            <p><strong>Phone:</strong> {{ admin_profile.phone|default:"Not provided" }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if not patient_profile and not doctor_profile and not admin_profile %}
+                        <div class="alert alert-danger">
+                            <h5>No Profile Found</h5>
+                            <p>This user does not have a Patient, Doctor, or Admin profile. This might be the cause of the login issue.</p>
+                            <a href="{% url 'healthcare:signup' %}" class="btn btn-primary">Complete Profile</a>
+                        </div>
+                    {% endif %}
+
+                    <h4>User Groups</h4>
+                    {% if groups %}
+                        <ul class="list-group">
+                            {% for group in groups %}
+                                <li class="list-group-item">{{ group.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No groups assigned</p>
+                    {% endif %}
+
+                    <h4>User Permissions</h4>
+                    {% if permissions %}
+                        <ul class="list-group">
+                            {% for permission in permissions %}
+                                <li class="list-group-item">{{ permission.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No specific permissions assigned</p>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <a href="{% url 'healthcare:dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+                        <a href="{% url 'healthcare:home' %}" class="btn btn-secondary">Go to Home</a>
+                        <a href="{% url 'healthcare:logout' %}" class="btn btn-danger">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

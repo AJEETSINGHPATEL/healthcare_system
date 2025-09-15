@@ -1,0 +1,311 @@
+{% extends 'healthcare/admin_base.html' %}
+{% load custom_filters %}
+
+{% block title %}System Reports - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Main content - Full Screen -->
+    <main role="main" class="px-4" style="width: 100%;">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">System Reports</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group mr-2">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportToCSV()">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportToPDF()">
+                            <i class="fas fa-file-pdf"></i> Export PDF
+                        </button>
+                    </div>
+                    <a href="{% url 'healthcare:admin_reports' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Reports
+                    </a>
+                </div>
+            </div>
+
+            <!-- System Health Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Users</h5>
+                            <h2 class="card-text">{{ total_users }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">Active Users</h5>
+                            <h2 class="card-text">{{ active_users }}</h2>
+                            <small>Last 30 days</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-info">
+                        <div class="card-body">
+                            <h5 class="card-title">System Uptime</h5>
+                            <h2 class="card-text">{{ system_uptime }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Appointments</h5>
+                            <h2 class="card-text">{{ total_appointments }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Metrics -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Overview</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="systemChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total Patients
+                                    <span class="badge badge-primary badge-pill">{{ total_patients }}</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total Doctors
+                                    <span class="badge badge-success badge-pill">{{ total_doctors }}</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total Prescriptions
+                                    <span class="badge badge-info badge-pill">{{ total_prescriptions }}</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    User Activity Rate
+                                    <span class="badge badge-warning badge-pill">
+                                        {% if total_users > 0 %}
+                                            {{ active_users|mul:100|div:total_users|floatformat:1 }}%
+                                        {% else %}
+                                            0%
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health Status -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Health Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <i class="fas fa-server fa-3x text-success mb-2"></i>
+                                        <h6>Database</h6>
+                                        <span class="badge badge-success">Operational</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <i class="fas fa-globe fa-3x text-success mb-2"></i>
+                                        <h6>Web Server</h6>
+                                        <span class="badge badge-success">Operational</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <i class="fas fa-shield-alt fa-3x text-success mb-2"></i>
+                                        <h6>Security</h6>
+                                        <span class="badge badge-success">Secure</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <i class="fas fa-clock fa-3x text-success mb-2"></i>
+                                        <h6>System Uptime</h6>
+                                        <span class="badge badge-success">{{ system_uptime }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Details -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">System Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> System Information</h6>
+                        <p>This system report provides an overview of the healthcare management system's current state and performance metrics.</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>User Metrics</h6>
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td>Total Registered Users:</td>
+                                        <td>{{ total_users }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Active Users (30 days):</td>
+                                        <td>{{ active_users }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Patient Accounts:</td>
+                                        <td>{{ total_patients }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Doctor Accounts:</td>
+                                        <td>{{ total_doctors }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Activity Metrics</h6>
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td>Total Appointments:</td>
+                                        <td>{{ total_appointments }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total Prescriptions:</td>
+                                        <td>{{ total_prescriptions }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Appointments per User:</td>
+                                        <td>
+                                            {% if total_users > 0 %}
+                                                {{ total_appointments|div:total_users|floatformat:1 }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>System Uptime:</td>
+                                        <td>{{ system_uptime }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function exportToCSV() {
+    // Simple CSV export functionality
+    const csvContent = "data:text/csv;charset=utf-8," +
+        "Metric,Value\n" +
+        "Total Users,{{ total_users }}\n" +
+        "Active Users,{{ active_users }}\n" +
+        "Total Patients,{{ total_patients }}\n" +
+        "Total Doctors,{{ total_doctors }}\n" +
+        "Total Appointments,{{ total_appointments }}\n" +
+        "Total Prescriptions,{{ total_prescriptions }}\n" +
+        "System Uptime,{{ system_uptime }}\n";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "system_reports.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function exportToPDF() {
+    // Placeholder for PDF export - would require additional library
+    alert("PDF export functionality would be implemented with a PDF generation library like ReportLab or jsPDF");
+}
+
+// Chart.js for system overview
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('systemChart').getContext('2d');
+    const systemChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Users', 'Patients', 'Doctors', 'Appointments'],
+            datasets: [{
+                label: 'Count',
+                data: [{{ total_users }}, {{ total_patients }}, {{ total_doctors }}, {{ total_appointments }}],
+                backgroundColor: [
+                    '#007bff',
+                    '#28a745',
+                    '#17a2b8',
+                    '#ffc107'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #333;
+}
+
+.sidebar .nav-link.active {
+    color: #007bff;
+}
+</style>
+{% endblock %}

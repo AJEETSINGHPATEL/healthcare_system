@@ -1,0 +1,209 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Add Patient - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Add New Patient</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- User Information Section -->
+                        <fieldset class="mb-4">
+                            <legend>User Information</legend>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger">{{ form.first_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger">{{ form.last_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                                    {{ form.username }}
+                                    {% if form.username.errors %}
+                                        <div class="text-danger">{{ form.username.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger">{{ form.email.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                                    {{ form.password }}
+                                    {% if form.password.errors %}
+                                        <div class="text-danger">{{ form.password.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.confirm_password.id_for_label }}" class="form-label">Confirm Password</label>
+                                    {{ form.confirm_password }}
+                                    {% if form.confirm_password.errors %}
+                                        <div class="text-danger">{{ form.confirm_password.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </fieldset>
+                        
+                        <!-- Address Section -->
+                        <fieldset class="mb-4">
+                            <legend>Address Information</legend>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="{{ address_form.line1.id_for_label }}" class="form-label">Address Line 1</label>
+                                    {{ address_form.line1 }}
+                                    {% if address_form.line1.errors %}
+                                        <div class="text-danger">{{ address_form.line1.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ address_form.city.id_for_label }}" class="form-label">City</label>
+                                    {{ address_form.city }}
+                                    {% if address_form.city.errors %}
+                                        <div class="text-danger">{{ address_form.city.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ address_form.state.id_for_label }}" class="form-label">State</label>
+                                    {{ address_form.state }}
+                                    {% if address_form.state.errors %}
+                                        <div class="text-danger">{{ address_form.state.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ address_form.pincode.id_for_label }}" class="form-label">Pincode</label>
+                                    {{ address_form.pincode }}
+                                    {% if address_form.pincode.errors %}
+                                        <div class="text-danger">{{ address_form.pincode.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </fieldset>
+                        
+                        <!-- Patient Profile Section -->
+                        <fieldset class="mb-4">
+                            <legend>Patient Profile</legend>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ patient_form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                                    {{ patient_form.date_of_birth }}
+                                    {% if patient_form.date_of_birth.errors %}
+                                        <div class="text-danger">{{ patient_form.date_of_birth.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ patient_form.phone.id_for_label }}" class="form-label">Phone Number</label>
+                                    {{ patient_form.phone }}
+                                    {% if patient_form.phone.errors %}
+                                        <div class="text-danger">{{ patient_form.phone.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="{{ patient_form.medical_history.id_for_label }}" class="form-label">Medical History</label>
+                                    {{ patient_form.medical_history }}
+                                    {% if patient_form.medical_history.errors %}
+                                        <div class="text-danger">{{ patient_form.medical_history.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Any relevant medical history (optional)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="{{ patient_form.profile_picture.id_for_label }}" class="form-label">Profile Picture</label>
+                                    {{ patient_form.profile_picture }}
+                                    {% if patient_form.profile_picture.errors %}
+                                        <div class="text-danger">{{ patient_form.profile_picture.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Upload a profile picture (optional)</div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Add Patient</button>
+                            <a href="{% url 'healthcare:admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+fieldset {
+    border: 1px solid #e0e0e0;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+legend {
+    font-size: 1.1rem;
+    font-weight: 500;
+    width: auto;
+    padding: 0 0.5rem;
+    margin-bottom: 0;
+}
+
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,486 @@
+{% extends 'healthcare/base.html' %}
+{% load static %}
+
+{% block title %}System Settings - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="page-header">
+        <h1><i class="fas fa-cogs"></i> System Settings</h1>
+        <p>Configure and customize your healthcare platform</p>
+    </div>
+
+    <!-- Settings Navigation -->
+    <div class="settings-nav">
+        <button class="nav-tab active" onclick="showTab('general')">General</button>
+        <button class="nav-tab" onclick="showTab('security')">Security</button>
+        <button class="nav-tab" onclick="showTab('notifications')">Notifications</button>
+        <button class="nav-tab" onclick="showTab('integrations')">Integrations</button>
+        <button class="nav-tab" onclick="showTab('backup')">Backup & Restore</button>
+    </div>
+
+    <!-- General Settings -->
+    <div id="general-tab" class="settings-tab active">
+        <div class="settings-section">
+            <h3>Platform Configuration</h3>
+            <div class="setting-group">
+                <label>Platform Name</label>
+                <input type="text" value="Healthcare Portal" class="setting-input">
+            </div>
+            <div class="setting-group">
+                <label>Platform Description</label>
+                <textarea class="setting-textarea">Comprehensive healthcare management system</textarea>
+            </div>
+            <div class="setting-group">
+                <label>Default Timezone</label>
+                <select class="setting-select">
+                    <option value="UTC">UTC</option>
+                    <option value="EST">Eastern Time</option>
+                    <option value="PST">Pacific Time</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>Maximum File Upload Size (MB)</label>
+                <input type="number" value="10" class="setting-input">
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>User Management</h3>
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" checked> Enable User Registration
+                </label>
+            </div>
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" checked> Require Email Verification
+                </label>
+            </div>
+            <div class="setting-group">
+                <label>Password Minimum Length</label>
+                <input type="number" value="8" class="setting-input">
+            </div>
+            <div class="setting-group">
+                <label>Session Timeout (minutes)</label>
+                <input type="number" value="30" class="setting-input">
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Settings -->
+    <div id="security-tab" class="settings-tab">
+        <div class="settings-section">
+            <h3>Security Policies</h3>
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" checked> Enable Two-Factor Authentication
+                </label>
+            </div>
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" checked> Force HTTPS
+                </label>
+            </div>
+            <div class="setting-group">
+                <label>Maximum Login Attempts</label>
+                <input type="number" value="5" class="setting-input">
+            </div>
+            <div class="setting-group">
+                <label>Account Lockout Duration (minutes)</label>
+                <input type="number" value="30" class="setting-input">
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>API Security</h3>
+            <div class="setting-group">
+                <label>API Rate Limit (requests per minute)</label>
+                <input type="number" value="100" class="setting-input">
+            </div>
+            <div class="setting-group">
+                <label>JWT Token Expiry (hours)</label>
+                <input type="number" value="24" class="setting-input">
+            </div>
+            <div class="setting-group">
+                <label>Allowed Origins</label>
+                <textarea class="setting-textarea" placeholder="https://yourdomain.com"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Settings -->
+    <div id="notifications-tab" class="settings-tab">
+        <div class="settings-section">
+            <h3>Email Notifications</h3>
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" checked> New User Registration
+                </label>
+            </div>
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" checked> Appointment Bookings
+                </label>
+            </div>
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" checked> System Alerts
+                </label>
+            </div>
+            <div class="setting-group">
+                <label>Admin Email Address</label>
+                <input type="email" value="admin@healthcare.com" class="setting-input">
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>SMS Notifications</h3>
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox"> Enable SMS Notifications
+                </label>
+            </div>
+            <div class="setting-group">
+                <label>SMS Provider API Key</label>
+                <input type="password" value="your-api-key" class="setting-input">
+            </div>
+        </div>
+    </div>
+
+    <!-- Integrations -->
+    <div id="integrations-tab" class="settings-tab">
+        <div class="settings-section">
+            <h3>Third-Party Integrations</h3>
+            <div class="integration-card">
+                <h4>Stripe Payment Gateway</h4>
+                <p>Process payments securely</p>
+                <div class="integration-status">
+                    <span class="status-badge connected">Connected</span>
+                    <button class="btn btn-sm">Configure</button>
+                </div>
+            </div>
+            <div class="integration-card">
+                <h4>Google Calendar</h4>
+                <p>Sync appointments with Google Calendar</p>
+                <div class="integration-status">
+                    <span class="status-badge disconnected">Disconnected</span>
+                    <button class="btn btn-sm">Connect</button>
+                </div>
+            </div>
+            <div class="integration-card">
+                <h4>Twilio SMS</h4>
+                <p>Send SMS notifications</p>
+                <div class="integration-status">
+                    <span class="status-badge connected">Connected</span>
+                    <button class="btn btn-sm">Configure</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup & Restore -->
+    <div id="backup-tab" class="settings-tab">
+        <div class="settings-section">
+            <h3>Backup Configuration</h3>
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" checked> Enable Automatic Backups
+                </label>
+            </div>
+            <div class="setting-group">
+                <label>Backup Frequency</label>
+                <select class="setting-select">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>Backup Retention (days)</label>
+                <input type="number" value="30" class="setting-input">
+            </div>
+            <div class="setting-group">
+                <label>Backup Storage Location</label>
+                <select class="setting-select">
+                    <option value="local">Local Storage</option>
+                    <option value="s3">Amazon S3</option>
+                    <option value="google">Google Drive</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Backup Actions</h3>
+            <div class="backup-actions">
+                <button class="btn btn-primary" onclick="createBackup()">
+                    <i class="fas fa-download"></i> Create Backup Now
+                </button>
+                <button class="btn btn-secondary" onclick="restoreBackup()">
+                    <i class="fas fa-upload"></i> Restore from Backup
+                </button>
+                <button class="btn btn-danger" onclick="deleteOldBackups()">
+                    <i class="fas fa-trash"></i> Delete Old Backups
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-actions">
+        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+        <button class="btn btn-secondary" onclick="resetSettings()">Reset to Defaults</button>
+    </div>
+</div>
+
+<style>
+.settings-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #6b7280;
+    font-size: 1.125rem;
+}
+
+.settings-nav {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.nav-tab {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.nav-tab.active {
+    background: #3b82f6;
+    color: white;
+}
+
+.settings-tab {
+    display: none;
+}
+
+.settings-tab.active {
+    display: block;
+}
+
+.settings-section {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.settings-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.setting-group {
+    margin-bottom: 1rem;
+}
+
+.setting-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.setting-input,
+.setting-select,
+.setting-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.setting-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.integration-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.integration-card h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.integration-card p {
+    color: #6b7280;
+    margin: 0;
+}
+
+.integration-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-badge.connected {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.disconnected {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.backup-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.settings-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .settings-container {
+        padding: 1rem;
+    }
+    
+    .settings-nav {
+        flex-direction: column;
+    }
+    
+    .integration-card {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .integration-status {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+</style>
+
+<script>
+// Settings functionality
+function showTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.settings-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Remove active class from all nav tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + '-tab').classList.add('active');
+    
+    // Add active class to selected nav tab
+    event.target.classList.add('active');
+}
+
+function saveSettings() {
+    alert('Settings saved successfully!');
+}
+
+function resetSettings() {
+    if (confirm('Are you sure you want to reset all settings to defaults?')) {
+        alert('Settings reset to defaults');
+    }
+}
+
+function createBackup() {
+    alert('Creating backup...');
+}
+
+function restoreBackup() {
+    alert('Restoring from backup...');
+}
+
+function deleteOldBackups() {
+    if (confirm('Are you sure you want to delete old backups?')) {
+        alert('Old backups deleted');
+    }
+}
+</script>
+{% endblock %}

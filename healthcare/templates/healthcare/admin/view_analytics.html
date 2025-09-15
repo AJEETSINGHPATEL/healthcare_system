@@ -1,0 +1,538 @@
+{% extends 'healthcare/base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - Admin{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+    <div class="page-header">
+        <h1><i class="fas fa-chart-line"></i> System Analytics</h1>
+        <p>Comprehensive insights into your healthcare platform</p>
+    </div>
+
+    <!-- Date Range Selector -->
+    <div class="date-range-selector">
+        <div class="date-inputs">
+            <label>From:</label>
+            <input type="date" id="startDate" value="2024-01-01">
+            <label>To:</label>
+            <input type="date" id="endDate" value="2024-12-31">
+            <button class="btn btn-primary" onclick="updateAnalytics()">
+                <i class="fas fa-sync"></i> Update
+            </button>
+        </div>
+        <div class="quick-filters">
+            <button class="btn btn-sm" onclick="setDateRange('today')">Today</button>
+            <button class="btn btn-sm" onclick="setDateRange('week')">This Week</button>
+            <button class="btn btn-sm" onclick="setDateRange('month')">This Month</button>
+            <button class="btn btn-sm" onclick="setDateRange('year')">This Year</button>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="metric-content">
+                <h3>1,247</h3>
+                <p>Total Users</p>
+                <span class="metric-change positive">+12.5%</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="metric-content">
+                <h3>3,421</h3>
+                <p>Appointments</p>
+                <span class="metric-change positive">+8.3%</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="metric-content">
+                <h3>$45,230</h3>
+                <p>Revenue</p>
+                <span class="metric-change positive">+15.7%</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="metric-content">
+                <h3>89</h3>
+                <p>Active Doctors</p>
+                <span class="metric-change positive">+5.2%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>User Growth</h3>
+                <div class="chart-controls">
+                    <button class="btn btn-sm active" onclick="changeChartPeriod('week')">Week</button>
+                    <button class="btn btn-sm" onclick="changeChartPeriod('month')">Month</button>
+                    <button class="btn btn-sm" onclick="changeChartPeriod('year')">Year</button>
+                </div>
+            </div>
+            <canvas id="userGrowthChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>Appointment Distribution</h3>
+            </div>
+            <canvas id="appointmentChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>Revenue Trends</h3>
+            </div>
+            <canvas id="revenueChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>Popular Specialties</h3>
+            </div>
+            <canvas id="specialtyChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Detailed Reports -->
+    <div class="reports-section">
+        <h2>Detailed Reports</h2>
+        <div class="report-cards">
+            <div class="report-card">
+                <h3>User Activity Report</h3>
+                <p>Detailed breakdown of user engagement and activity patterns</p>
+                <button class="btn btn-primary" onclick="generateReport('user-activity')">
+                    <i class="fas fa-file-pdf"></i> Generate PDF
+                </button>
+            </div>
+            <div class="report-card">
+                <h3>Financial Report</h3>
+                <p>Revenue analysis and financial performance metrics</p>
+                <button class="btn btn-primary" onclick="generateReport('financial')">
+                    <i class="fas fa-file-excel"></i> Generate Excel
+                </button>
+            </div>
+            <div class="report-card">
+                <h3>Doctor Performance</h3>
+                <p>Analysis of doctor ratings, appointments, and patient feedback</p>
+                <button class="btn btn-primary" onclick="generateReport('doctor-performance')">
+                    <i class="fas fa-chart-bar"></i> View Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.analytics-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #6b7280;
+    font-size: 1.125rem;
+}
+
+.date-range-selector {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-inputs label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.date-inputs input {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+}
+
+.quick-filters {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.metric-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.metric-card:nth-child(1) .metric-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.metric-card:nth-child(2) .metric-icon {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.metric-card:nth-child(3) .metric-icon {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.metric-card:nth-child(4) .metric-icon {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+}
+
+.metric-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.metric-content p {
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.metric-change {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.metric-change.positive {
+    color: #10b981;
+}
+
+.metric-change.negative {
+    color: #ef4444;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.chart-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chart-controls .btn {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.chart-controls .btn.active {
+    background: #3b82f6;
+    color: white;
+}
+
+canvas {
+    max-height: 300px;
+}
+
+.reports-section {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.reports-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.report-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.report-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.report-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.report-card p {
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .analytics-container {
+        padding: 1rem;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .date-range-selector {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .date-inputs {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Chart initialization
+let userGrowthChart, appointmentChart, revenueChart, specialtyChart;
+
+// Sample data
+const userGrowthData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+        label: 'New Users',
+        data: [65, 78, 90, 81, 95, 110],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.4
+    }]
+};
+
+const appointmentData = {
+    labels: ['Cardiology', 'Neurology', 'Pediatrics', 'Orthopedics', 'Dermatology'],
+    datasets: [{
+        data: [30, 25, 20, 15, 10],
+        backgroundColor: [
+            '#3b82f6',
+            '#10b981',
+            '#f59e0b',
+            '#ef4444',
+            '#8b5cf6'
+        ]
+    }]
+};
+
+const revenueData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+        label: 'Revenue ($)',
+        data: [12000, 15000, 18000, 16000, 20000, 22000],
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        tension: 0.4
+    }]
+};
+
+const specialtyData = {
+    labels: ['Cardiology', 'Neurology', 'Pediatrics', 'Orthopedics', 'Dermatology', 'Others'],
+    datasets: [{
+        label: 'Number of Doctors',
+        data: [25, 18, 15, 12, 10, 9],
+        backgroundColor: '#3b82f6'
+    }]
+};
+
+// Initialize charts
+function initCharts() {
+    // User Growth Chart
+    const userCtx = document.getElementById('userGrowthChart').getContext('2d');
+    userGrowthChart = new Chart(userCtx, {
+        type: 'line',
+        data: userGrowthData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Appointment Distribution Chart
+    const appointmentCtx = document.getElementById('appointmentChart').getContext('2d');
+    appointmentChart = new Chart(appointmentCtx, {
+        type: 'doughnut',
+        data: appointmentData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: revenueData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Specialty Chart
+    const specialtyCtx = document.getElementById('specialtyChart').getContext('2d');
+    specialtyChart = new Chart(specialtyCtx, {
+        type: 'bar',
+        data: specialtyData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Date range functions
+function setDateRange(period) {
+    const today = new Date();
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    
+    switch(period) {
+        case 'today':
+            startDate.value = today.toISOString().split('T')[0];
+            endDate.value = today.toISOString().split('T')[0];
+            break;
+        case 'week':
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            startDate.value = weekAgo.toISOString().split('T')[0];
+            endDate.value = today.toISOString().split('T')[0];
+            break;
+        case 'month':
+            const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            startDate.value = monthAgo.toISOString().split('T')[0];
+            endDate.value = today.toISOString().split('T')[0];
+            break;
+        case 'year':
+            const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+            startDate.value = yearAgo.toISOString().split('T')[0];
+            endDate.value = today.toISOString().split('T')[0];
+            break;
+    }
+}
+
+function updateAnalytics() {
+    // Simulate data update
+    alert('Analytics updated for selected date range');
+}
+
+function changeChartPeriod(period) {
+    // Update active button
+    document.querySelectorAll('.chart-controls .btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update chart data based on period
+    alert('Chart period changed to: ' + period);
+}
+
+function generateReport(type) {
+    alert('Generating ' + type + ' report...');
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initCharts);
+</script>
+{% endblock %}

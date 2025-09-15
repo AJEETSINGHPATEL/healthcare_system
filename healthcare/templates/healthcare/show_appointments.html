@@ -1,0 +1,80 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Show Appointments - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-calendar-check text-primary"></i> {{ filter_name }}
+                    </h3>
+                    <div class="filter-buttons">
+                        <div class="btn-group" role="group" aria-label="Appointment filters">
+                            <a href="?filter=upcoming" class="btn btn-sm {% if current_filter == 'upcoming' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                <i class="fas fa-clock"></i> Upcoming
+                            </a>
+                            <a href="?filter=today" class="btn btn-sm {% if current_filter == 'today' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                <i class="fas fa-calendar-day"></i> Today
+                            </a>
+                            <a href="?filter=all" class="btn btn-sm {% if current_filter == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                <i class="fas fa-list"></i> All
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Patient</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td>{{ appointment.formatted_date }}</td>
+                                    <td>{{ appointment.formatted_time }}</td>
+                                    <td>{{ appointment.patient.full_name }}</td>
+                                    <td>{{ appointment.reason|default:"Not specified" }}</td>
+                                    <td>
+                                        {% if appointment.status == 'confirmed' %}
+                                        <span class="badge bg-success">Confirmed</span>
+                                        {% elif appointment.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                        {% elif appointment.status == 'completed' %}
+                                        <span class="badge bg-info">Completed</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if appointment.status == 'confirmed' %}
+                                        <button class="btn btn-sm btn-primary">Start</button>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No appointments found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

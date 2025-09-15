@@ -1,0 +1,57 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Create Prescription - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Create New Prescription</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-3">
+            <label for="{{ form.patient.id_for_label }}" class="form-label">Patient</label>
+            {{ form.patient }}
+            {% if form.patient.errors %}
+                <div class="text-danger">{{ form.patient.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.medication_name.id_for_label }}" class="form-label">Medication Name</label>
+            {{ form.medication_name }}
+            {% if form.medication_name.errors %}
+                <div class="text-danger">{{ form.medication_name.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.dosage.id_for_label }}" class="form-label">Dosage</label>
+            {{ form.dosage }}
+            {% if form.dosage.errors %}
+                <div class="text-danger">{{ form.dosage.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.frequency.id_for_label }}" class="form-label">Frequency</label>
+            {{ form.frequency }}
+            {% if form.frequency.errors %}
+                <div class="text-danger">{{ form.frequency.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.duration.id_for_label }}" class="form-label">Duration</label>
+            {{ form.duration }}
+            {% if form.duration.errors %}
+                <div class="text-danger">{{ form.duration.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.instructions.id_for_label }}" class="form-label">Instructions</label>
+            {{ form.instructions }}
+            {% if form.instructions.errors %}
+                <div class="text-danger">{{ form.instructions.errors }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Create Prescription</button>
+        <a href="{% url 'healthcare:prescription_history' %}" class="btn btn-secondary ms-2">View History</a>
+    </form>
+</div>
+{% endblock %}

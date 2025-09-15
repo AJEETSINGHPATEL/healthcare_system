@@ -1,0 +1,123 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}View History - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Prescription History</h2>
+        <a href="{% url 'healthcare:create_prescription' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New Prescription
+        </a>
+    </div>
+
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" name="q" class="form-control" placeholder="Search by patient name or medication..." value="{{ query }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Prescriptions List -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Your Prescriptions</h5>
+        </div>
+        <div class="card-body">
+            {% if prescriptions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Patient</th>
+                                <th>Medication</th>
+                                <th>Dosage</th>
+                                <th>Frequency</th>
+                                <th>Duration</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prescription in prescriptions %}
+                            <tr>
+                                <td>{{ prescription.created_at|date:"M d, Y" }}</td>
+                                <td>{{ prescription.patient.full_name }}</td>
+                                <td>{{ prescription.medication_name }}</td>
+                                <td>{{ prescription.dosage }}</td>
+                                <td>{{ prescription.frequency }}</td>
+                                <td>{{ prescription.duration }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info" onclick="viewPrescription({{ prescription.id }})">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-prescription-bottle-alt fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No prescriptions found</h5>
+                    <p class="text-muted">
+                        {% if query %}
+                            No prescriptions match your search criteria.
+                        {% else %}
+                            You haven't created any prescriptions yet.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'healthcare:create_prescription' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Your First Prescription
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="text-center mt-4">
+        <a href="{% url 'healthcare:doctor_dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Prescription Details Modal -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Prescription Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="prescriptionDetails">
+                <!-- Details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewPrescription(prescriptionId) {
+    // This would typically make an AJAX call to get prescription details
+    // For now, we'll show a placeholder
+    const modal = new bootstrap.Modal(document.getElementById('prescriptionModal'));
+    document.getElementById('prescriptionDetails').innerHTML = `
+        <p>Prescription details for ID: ${prescriptionId}</p>
+        <p>This feature would show full prescription details including instructions.</p>
+    `;
+    modal.show();
+}
+</script>
+{% endblock %}

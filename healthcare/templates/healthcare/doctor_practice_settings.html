@@ -1,0 +1,322 @@
+{% extends 'healthcare/base.html' %}
+{% load static %}
+
+{% block title %}Practice Settings - Doctor Dashboard{% endblock %}
+
+{% block content %}
+<div class="practice-container">
+    <div class="page-header">
+        <h1><i class="fas fa-hospital"></i> Practice Settings</h1>
+        <p>Configure your practice preferences and availability</p>
+    </div>
+
+    <div class="practice-form-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="practice-form">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <h3>Working Hours</h3>
+                <div class="form-group">
+                    <label for="{{ form.working_hours_start.id_for_label }}">{{ form.working_hours_start.label }}</label>
+                    {{ form.working_hours_start }}
+                    {% if form.working_hours_start.errors %}
+                        <div class="text-danger">{{ form.working_hours_start.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.working_hours_end.id_for_label }}">{{ form.working_hours_end.label }}</label>
+                    {{ form.working_hours_end }}
+                    {% if form.working_hours_end.errors %}
+                        <div class="text-danger">{{ form.working_hours_end.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Appointment Settings</h3>
+                <div class="form-group">
+                    <label for="{{ form.break_duration.id_for_label }}">{{ form.break_duration.label }}</label>
+                    {{ form.break_duration }}
+                    {% if form.break_duration.errors %}
+                        <div class="text-danger">{{ form.break_duration.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.max_patients_per_day.id_for_label }}">{{ form.max_patients_per_day.label }}</label>
+                    {{ form.max_patients_per_day }}
+                    {% if form.max_patients_per_day.errors %}
+                        <div class="text-danger">{{ form.max_patients_per_day.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Additional Settings</h3>
+                <div class="form-group">
+                    <label class="toggle-switch">
+                        {{ form.consultation_notes_auto_save }}
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">{{ form.consultation_notes_auto_save.label }}</span>
+                    </label>
+                    {% if form.consultation_notes_auto_save.errors %}
+                        <div class="text-danger">{{ form.consultation_notes_auto_save.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'healthcare:doctor_settings' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Practice Settings</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.practice-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #6b7280;
+    font-size: 1.125rem;
+}
+
+.practice-form-container {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.working-hours {
+    margin-top: 1rem;
+}
+
+.working-hours h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.day-schedule {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #f9fafb;
+}
+
+.day-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.day-toggle input {
+    margin-right: 0.5rem;
+}
+
+.day-label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.time-slots {
+    display: flex;
+    gap: 1rem;
+    margin-left: auto;
+}
+
+.time-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-input-group label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.time-input {
+    width: 120px;
+}
+
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.toggle-slider {
+    width: 50px;
+    height: 24px;
+    background: #d1d5db;
+    border-radius: 24px;
+    position: relative;
+    margin-right: 1rem;
+    transition: background 0.3s;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: #3b82f6;
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(26px);
+}
+
+.toggle-label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .practice-container {
+        padding: 1rem;
+    }
+
+    .day-schedule {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .time-slots {
+        margin-left: 0;
+        margin-top: 1rem;
+        justify-content: space-between;
+    }
+
+    .time-input {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+// Form submission
+document.querySelector('.practice-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Practice settings saved successfully!');
+});
+
+// Add split filter for days
+const days = 'Monday Tuesday Wednesday Thursday Friday Saturday Sunday'.split(' ');
+</script>
+{% endblock %}

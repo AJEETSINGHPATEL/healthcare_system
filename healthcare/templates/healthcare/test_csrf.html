@@ -1,0 +1,54 @@
+{% extends 'healthcare/base.html' %}
+{% load static %}
+
+{% block title %}CSRF Test - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-shield-alt text-primary"></i> CSRF Token Test
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p>This is a test page to verify CSRF token functionality.</p>
+                    
+                    <h5>Current CSRF Token:</h5>
+                    <div class="alert alert-info">
+                        <code>{{ csrf_token }}</code>
+                    </div>
+                    
+                    <h5>Test Form:</h5>
+                    <form method="POST" action="{% url 'healthcare:book_appointment' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Test Field</label>
+                            <input type="text" class="form-control" name="test_field" value="Test Value">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Test Submit
+                        </button>
+                    </form>
+                    
+                    <hr>
+                    <h5>Debug Information:</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <strong>User:</strong> {{ user.username }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Authenticated:</strong> {{ user.is_authenticated }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Session Key:</strong> {{ request.session.session_key|default:"No session" }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

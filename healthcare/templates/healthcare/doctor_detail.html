@@ -1,0 +1,55 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Doctor Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Doctor Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            {% if doctor.profile_picture %}
+                                <img src="{{ doctor.profile_picture.url }}" alt="Doctor Photo" class="img-fluid rounded-circle" style="max-width: 200px;">
+                            {% else %}
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 200px; height: 200px; font-size: 4rem;">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h2>{{ doctor.user.first_name }} {{ doctor.user.last_name }}</h2>
+                            <hr>
+                            <p><strong>Specialization:</strong> {{ doctor.specialization }}</p>
+                            <p><strong>Experience:</strong> {{ doctor.experience_years }} years</p>
+                            <p><strong>License Number:</strong> {{ doctor.license_number }}</p>
+                            <p><strong>Contact Number:</strong> {{ doctor.contact_number }}</p>
+                            <p><strong>Email:</strong> {{ doctor.user.email }}</p>
+                            <p><strong>Date of Birth:</strong> {{ doctor.date_of_birth }}</p>
+                            <p><strong>Address:</strong> {{ doctor.address }}</p>
+                            <p><strong>Bio:</strong> {{ doctor.bio }}</p>
+                            <p><strong>Available:</strong> 
+                                {% if doctor.is_available %}
+                                    <span class="badge badge-success">Yes</span>
+                                {% else %}
+                                    <span class="badge badge-danger">No</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'healthcare:dashboard' %}" class="btn btn-primary">Back to Dashboard</a>
+                        {% if user_type == 'Admin' %}
+                            <a href="{% url 'healthcare:admin_dashboard' %}" class="btn btn-secondary">Admin Panel</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

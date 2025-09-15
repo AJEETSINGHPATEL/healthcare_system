@@ -1,0 +1,260 @@
+{% extends 'healthcare/admin_base.html' %}
+{% load custom_filters %}
+
+{% block title %}Financial Reports - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Main content - Full Screen -->
+    <main role="main" class="px-4" style="width: 100%;">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Financial Reports</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group mr-2">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportToCSV()">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportToPDF()">
+                            <i class="fas fa-file-pdf"></i> Export PDF
+                        </button>
+                    </div>
+                    <a href="{% url 'healthcare:admin_reports' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Reports
+                    </a>
+                </div>
+            </div>
+
+            <!-- Financial Overview Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Revenue</h5>
+                            <h2 class="card-text">${{ total_revenue|floatformat:2 }}</h2>
+                            <small>Based on completed appointments</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white bg-info">
+                        <div class="card-body">
+                            <h5 class="card-title">Monthly Revenue</h5>
+                            <h2 class="card-text">${{ monthly_revenue|floatformat:2 }}</h2>
+                            <small>Current month</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">Avg. Revenue per Appointment</h5>
+                            <h2 class="card-text">${{ avg_revenue_per_appointment|floatformat:2 }}</h2>
+                            <small>Fixed rate</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Breakdown -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Revenue Breakdown</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="revenueChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Appointment Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total Appointments
+                                    <span class="badge badge-primary badge-pill">{{ total_appointments }}</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    Completed Appointments
+                                    <span class="badge badge-success badge-pill">{{ completed_appointments }}</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    Pending Appointments
+                                    <span class="badge badge-warning badge-pill">{{ total_appointments|add:completed_appointments|add:-1 }}</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    Completion Rate
+                                    <span class="badge badge-info badge-pill">
+                                        {% if total_appointments > 0 %}
+                                            {{ completed_appointments|mul:100|div:total_appointments|floatformat:1 }}%
+                                        {% else %}
+                                            0%
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Financial Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> Note</h6>
+                        <p>This financial report is based on appointment data. In a production system, this would be integrated with actual billing and payment systems.</p>
+                        <ul>
+                            <li>Revenue calculation: ${{ avg_revenue_per_appointment }} per completed appointment</li>
+                            <li>Monthly figures are for the current month only</li>
+                            <li>Pending appointments are not included in revenue calculations</li>
+                        </ul>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Revenue Metrics</h6>
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td>Total Potential Revenue:</td>
+                                        <td>${{ total_appointments|mul:avg_revenue_per_appointment|floatformat:2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Actual Revenue:</td>
+                                        <td>${{ total_revenue|floatformat:2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Unrealized Revenue:</td>
+                                        <td>${{ total_appointments|mul:avg_revenue_per_appointment|add:total_revenue|mul:-1|floatformat:2 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Performance Indicators</h6>
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td>Appointment Completion Rate:</td>
+                                        <td>
+                                            {% if total_appointments > 0 %}
+                                                {{ completed_appointments|mul:100|div:total_appointments|floatformat:1 }}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Revenue per Appointment:</td>
+                                        <td>${{ avg_revenue_per_appointment|floatformat:2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Revenue per Patient:</td>
+                                        <td>
+                                            {% if total_patients > 0 %}
+                                                ${{ total_revenue|div:total_patients|floatformat:2 }}
+                                            {% else %}
+                                                $0.00
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function exportToCSV() {
+    // Simple CSV export functionality
+    const csvContent = "data:text/csv;charset=utf-8," +
+        "Metric,Value\n" +
+        "Total Revenue,${{ total_revenue|floatformat:2 }}\n" +
+        "Monthly Revenue,${{ monthly_revenue|floatformat:2 }}\n" +
+        "Avg Revenue per Appointment,${{ avg_revenue_per_appointment|floatformat:2 }}\n" +
+        "Total Appointments,{{ total_appointments }}\n" +
+        "Completed Appointments,{{ completed_appointments }}\n";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "financial_reports.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function exportToPDF() {
+    // Placeholder for PDF export - would require additional library
+    alert("PDF export functionality would be implemented with a PDF generation library like ReportLab or jsPDF");
+}
+
+// Chart.js for revenue breakdown
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed Revenue', 'Pending Revenue'],
+            datasets: [{
+                data: [{{ total_revenue }}, {{ total_appointments|mul:avg_revenue_per_appointment|add:total_revenue|mul:-1 }}],
+                backgroundColor: [
+                    '#28a745',
+                    '#ffc107'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #333;
+}
+
+.sidebar .nav-link.active {
+    color: #007bff;
+}
+</style>
+{% endblock %}

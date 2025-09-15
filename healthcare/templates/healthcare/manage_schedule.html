@@ -1,0 +1,141 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Manage Schedule - Healthcare System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'healthcare:doctor_dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'healthcare:schedule' %}">
+                            <i class="fas fa-calendar-alt"></i> Schedule
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'healthcare:show_appointments' %}">
+                            <i class="fas fa-calendar-check"></i> Appointments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'healthcare:my_patients' %}">
+                            <i class="fas fa-users"></i> My Patients
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'healthcare:prescriptions' %}">
+                            <i class="fas fa-prescription"></i> Prescriptions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'healthcare:doctor_settings' %}">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Manage Schedule</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{% url 'healthcare:schedule' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Schedule
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Weekly Schedule Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Set your availability for each day of the week. Patients can only book appointments during your available hours.</p>
+
+                            <form method="post">
+                                {% csrf_token %}
+
+                                {% for form in schedule_forms %}
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">{{ form.day_of_week.value|title }}</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Start Time</label>
+                                                {{ form.start_time }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">End Time</label>
+                                                {{ form.end_time }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-check">
+                                                    {{ form.is_available }}
+                                                    <label class="form-check-label" for="{{ form.is_available.id_for_label }}">
+                                                        Available
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button type="submit" name="day" value="{{ form.day_of_week.value }}" class="btn btn-primary">
+                                                    <i class="fas fa-save"></i> Save {{ form.day_of_week.value|title }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {% if form.errors %}
+                                        <div class="alert alert-danger mt-2">
+                                            {% for field, errors in form.errors.items %}
+                                                {% for error in errors %}
+                                                    <p class="mb-0">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const startTime = form.querySelector('input[type="time"]:first-of-type');
+            const endTime = form.querySelector('input[type="time"]:last-of-type');
+
+            if (startTime && endTime && startTime.value && endTime.value) {
+                if (startTime.value >= endTime.value) {
+                    e.preventDefault();
+                    alert('End time must be after start time.');
+                    return false;
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

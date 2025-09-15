@@ -1,0 +1,207 @@
+{% extends 'healthcare/admin_base.html' %}
+
+{% block title %}Appointment Reports - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Main content - Full Screen -->
+    <main role="main" class="px-4" style="width: 100%;">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Appointment Reports</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group mr-2">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportToCSV()">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportToPDF()">
+                            <i class="fas fa-file-pdf"></i> Export PDF
+                        </button>
+                    </div>
+                    <a href="{% url 'healthcare:admin_reports' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Reports
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Appointments</h5>
+                            <h2 class="card-text">{{ total_appointments }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">Pending</h5>
+                            <h2 class="card-text">{{ pending_appointments }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-info">
+                        <div class="card-body">
+                            <h5 class="card-title">Confirmed</h5>
+                            <h2 class="card-text">{{ confirmed_appointments }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">Completed</h5>
+                            <h2 class="card-text">{{ completed_appointments }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments by Doctor -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Appointments by Doctor</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Doctor</th>
+                                            <th>Total Appointments</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for doctor_stat in appointments_by_doctor %}
+                                        <tr>
+                                            <td>Dr. {{ doctor_stat.doctor__user__first_name }} {{ doctor_stat.doctor__user__last_name }}</td>
+                                            <td>{{ doctor_stat.total }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="2" class="text-center">No appointment data available</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Appointment Status Distribution</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="statusChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Appointments -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Appointments</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in recent_appointments %}
+                                <tr>
+                                    <td>{{ appointment.patient.full_name }}</td>
+                                    <td>Dr. {{ appointment.doctor.full_name }}</td>
+                                    <td>{{ appointment.formatted_date }}</td>
+                                    <td>{{ appointment.formatted_time }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if appointment.status == 'pending' %}warning{% elif appointment.status == 'confirmed' %}info{% elif appointment.status == 'completed' %}success{% else %}danger{% endif %}">
+                                            {{ appointment.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ appointment.reason|truncatechars:30 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No recent appointments</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function exportToCSV() {
+    // Simple CSV export functionality
+    const csvContent = "data:text/csv;charset=utf-8," +
+        "Patient,Doctor,Date,Time,Status,Reason\n" +
+        {% for appointment in recent_appointments %}
+        "{{ appointment.patient.full_name }},Dr. {{ appointment.doctor.full_name }},{{ appointment.formatted_date }},{{ appointment.formatted_time }},{{ appointment.status }},{{ appointment.reason }}\n" +
+        {% endfor %}
+        "";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "appointment_reports.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function exportToPDF() {
+    // Redirect to PDF download URL
+    window.location.href = "{% url 'healthcare:download_pdf' 'appointment' %}";
+}
+
+// Chart.js for status distribution
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    const statusChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+            datasets: [{
+                data: [{{ pending_appointments }}, {{ confirmed_appointments }}, {{ completed_appointments }}, {{ cancelled_appointments }}],
+                backgroundColor: [
+                    '#ffc107',
+                    '#17a2b8',
+                    '#28a745',
+                    '#dc3545'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+});
+</script>
+
+
+{% endblock %}

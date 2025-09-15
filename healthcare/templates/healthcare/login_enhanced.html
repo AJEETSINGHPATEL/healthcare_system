@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Healthcare Portal</title>
+    {% load static %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="{% static 'healthcare/css/login-enhanced.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <h1>Welcome Back</h1>
+            <p>Sign in to access your healthcare portal</p>
+        </div>
+
+        <form method="post" action="{% url 'healthcare:login' %}" class="login-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <input type="text" 
+                       name="username" 
+                       class="form-input" 
+                       placeholder=" " 
+                       required
+                       aria-label="Username">
+                <label>Username</label>
+            </div>
+
+            <div class="form-group">
+                <input type="password" 
+                       name="password" 
+                       class="form-input" 
+                       placeholder=" " 
+                       required
+                       aria-label="Password">
+                <label>Password</label>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                <span>Sign In</span>
+            </button>
+
+            <div class="login-links">
+                <a href="{% url 'healthcare:signup' %}">Don't have an account? Sign Up</a>
+                <br>
+                <a href="{% url 'healthcare:admin_login' %}" style="margin-top: 0.5rem; display: inline-block;">
+                    <i class="fas fa-shield-alt"></i> Admin Login
+                </a>
+            </div>
+
+            <!-- Demo Login Section -->
+            <div class="demo-login-section" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e0e0e0;">
+                <p style="text-align: center; margin-bottom: 1rem; color: #666; font-size: 0.9rem;">
+                    Want to explore without creating an account?
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="{% url 'healthcare:demo_login' 'patient' %}" 
+                       class="btn-demo" 
+                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                              color: white; 
+                              padding: 0.75rem 1.5rem; 
+                              border-radius: 8px; 
+                              text-decoration: none; 
+                              font-weight: 500;
+                              transition: all 0.3s ease;">
+                        <i class="fas fa-user-injured"></i> Demo Patient
+                    </a>
+                    <a href="{% url 'healthcare:demo_login' 'doctor' %}" 
+                       class="btn-demo" 
+                       style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+                              color: white; 
+                              padding: 0.75rem 1.5rem; 
+                              border-radius: 8px; 
+                              text-decoration: none; 
+                              font-weight: 500;
+                              transition: all 0.3s ease;">
+                        <i class="fas fa-user-md"></i> Demo Doctor
+                    </a>
+                </div>
+                <p style="text-align: center; margin-top: 0.75rem; color: #888; font-size: 0.8rem;">
+                    Experience the platform with sample data
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <!-- JavaScript temporarily disabled for testing -->
+    <!-- <script src="{% static 'healthcare/js/login-enhanced.js' %}"></script> -->
+</body>
+</html>

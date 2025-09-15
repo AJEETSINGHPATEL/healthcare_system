@@ -1,0 +1,88 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Settings - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-cog text-primary"></i> Doctor Settings
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> Settings management is now available. Choose an option below to configure your preferences.
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Profile Settings</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Update your personal and professional information.</p>
+                                    <a href="{% url 'healthcare:doctor_update_profile' %}" class="btn btn-primary">
+                                        <i class="fas fa-user-edit"></i> Edit Profile
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Notification Settings</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Manage your notification preferences.</p>
+                                    <a href="{% url 'healthcare:doctor_notification_settings' %}" class="btn btn-info">
+                                        <i class="fas fa-bell"></i> Manage Notifications
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Security Settings</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Change your password and security preferences.</p>
+                                    <a href="{% url 'healthcare:doctor_change_password' %}" class="btn btn-warning">
+                                        <i class="fas fa-lock"></i> Change Password
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Practice Settings</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Configure your practice preferences and availability.</p>
+                                    <a href="{% url 'healthcare:doctor_practice_settings' %}" class="btn btn-success">
+                                        <i class="fas fa-cogs"></i> Practice Settings
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'healthcare:doctor_dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

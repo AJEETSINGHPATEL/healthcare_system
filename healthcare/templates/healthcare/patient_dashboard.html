@@ -1,0 +1,354 @@
+{% extends 'healthcare/base.html' %}
+{% load static %}
+
+{% block title_patient %}Patient Dashboard - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container patient-dashboard">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar">
+                <div class="text-center mb-4">
+                    {% if patient.profile_picture %}
+                        <img src="{{ patient.profile_picture.url }}" alt="Profile" class="profile-picture img-fluid rounded-circle border border-3 border-primary">
+                    {% else %}
+                        <img src="https://via.placeholder.com/120" alt="Profile" class="profile-picture img-fluid rounded-circle border border-3 border-primary">
+                    {% endif %}
+                    <h5 class="mt-3">{{ patient.full_name }}</h5>
+                    <span class="badge bg-primary">Patient</span>
+                    {% if request.session.is_demo_user %}
+                    <div class="mt-2">
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-flask"></i> Demo Mode
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="{% url 'healthcare:patient_dashboard' %}">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                    <a class="nav-link" href="{% url 'healthcare:book_appointment' %}">
+                        <i class="fas fa-calendar-check"></i> Book Appointment
+                    </a>
+                    <a class="nav-link" href="{% url 'healthcare:view_reports' %}">
+                        <i class="fas fa-file-medical"></i> View Reports
+                    </a>
+                    <a class="nav-link" href="#appointments-section">
+                        <i class="fas fa-calendar-alt"></i> Appointments
+                    </a>
+                    <a class="nav-link" href="#schedule-section">
+                        <i class="fas fa-clock"></i> Schedule
+                    </a>
+                    <a class="nav-link" href="#prescriptions-section">
+                        <i class="fas fa-pills"></i> Prescriptions
+                    </a>
+                    <a class="nav-link" href="#medical-history-section">
+                        <i class="fas fa-file-medical"></i> Medical History
+                    </a>
+                    <a class="nav-link" href="{% url 'healthcare:admin_settings' %}">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <!-- Welcome Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">
+                        <i class="fas fa-heart text-danger"></i> Welcome, {{ patient.first_name }}!
+                    </h2>
+                    <p class="text-muted">Here's your health dashboard overview</p>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card bg-primary text-white">
+                        <h3><i class="fas fa-calendar-alt"></i> {{ upcoming_appointments|length }}</h3>
+                        <p>Upcoming Appointments</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card bg-success text-white">
+                        <h3><i class="fas fa-file-medical"></i> 12</h3>
+                        <p>Medical Records</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card bg-info text-white">
+                        <h3><i class="fas fa-pills"></i> 5</h3>
+                        <p>Active Prescriptions</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card bg-warning text-dark">
+                        <h3><i class="fas fa-clock"></i> 2</h3>
+                        <p>Scheduled Visits</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-circle"></i> Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> {{ patient.full_name }}</p>
+                            <p><strong>Email:</strong> {{ patient.user.email }}</p>
+                            <p><strong>Phone:</strong> {{ patient.phone|default:"Not provided" }}</p>
+                            <p><strong>Date of Birth:</strong> {{ patient.date_of_birth|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Address:</strong></p>
+                            <p>{{ patient.address.line1 }}<br>
+                            {{ patient.address.city }}, {{ patient.address.state }}<br>
+                            {{ patient.address.pincode }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments Section -->
+            <div class="card mb-4" id="appointments-section">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Upcoming Appointments</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Doctor</th>
+                                    <th>Specialization</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if upcoming_appointments %}
+                                    {% for appointment in upcoming_appointments %}
+                                    <tr>
+                                        <td>{{ appointment.appointment_date|date:"M d, Y" }} - {{ appointment.appointment_time|time:"g:i A" }}</td>
+                                        <td>Dr. {{ appointment.doctor.user.get_full_name }}</td>
+                                        <td>{{ appointment.doctor.specialization }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if appointment.status == 'confirmed' %}bg-success
+                                                {% elif appointment.status == 'pending' %}bg-warning text-dark
+                                                {% elif appointment.status == 'cancelled' %}bg-danger
+                                                {% else %}bg-info{% endif %}">
+                                                {{ appointment.status|title }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">
+                                            No upcoming appointments found.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-primary mt-3" onclick="location.href='{% url 'healthcare:book_appointment' %}'">
+                        <i class="fas fa-calendar-plus"></i> Book New Appointment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Schedule Section -->
+            <div class="card mb-4" id="schedule-section">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock"></i> My Schedule</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Today's Schedule</h6>
+                            <div class="schedule-item">
+                                <strong>10:00 AM</strong> - Follow-up with Dr. Smith
+                            </div>
+                            <div class="schedule-item">
+                                <strong>2:00 PM</strong> - Medication Refill
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Weekly Overview</h6>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-success" style="width: 75%">3/4 Appointments</div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-info" style="width: 50%">2/4 Medications</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prescriptions Section -->
+            <div class="card mb-4" id="prescriptions-section">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-pills"></i> Active Prescriptions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Medication</th>
+                                    <th>Dosage</th>
+                                    <th>Frequency</th>
+                                    <th>Prescribed By</th>
+                                    <th>Refills</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Lisinopril</td>
+                                    <td>10mg</td>
+                                    <td>Once daily</td>
+                                    <td>Dr. Smith</td>
+                                    <td>2 remaining</td>
+                                </tr>
+                                <tr>
+                                    <td>Metformin</td>
+                                    <td>500mg</td>
+                                    <td>Twice daily</td>
+                                    <td>Dr. Brown</td>
+                                    <td>1 remaining</td>
+                                </tr>
+                                <tr>
+                                    <td>Atorvastatin</td>
+                                    <td>20mg</td>
+                                    <td>Once daily</td>
+                                    <td>Dr. Wilson</td>
+                                    <td>3 remaining</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical History Section -->
+            <div class="card mb-4" id="medical-history-section">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-notes-medical"></i> Medical History</h5>
+                </div>
+                <div class="card-body">
+                    {% if patient.medical_history %}
+                        <div class="medical-history-content">
+                            <p>{{ patient.medical_history }}</p>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No medical history provided yet.</p>
+                    {% endif %}
+                    <button class="btn btn-primary mt-3">
+                        <i class="fas fa-plus"></i> Update Medical History
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-primary w-100" onclick="location.href='{% url 'healthcare:book_appointment' %}'">
+                                <i class="fas fa-calendar-plus"></i> Book Appointment
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-success w-100" onclick="location.href='{% url 'healthcare:view_reports' %}'">
+                                <i class="fas fa-file-upload"></i> Upload Reports
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-info w-100">
+                                <i class="fas fa-prescription"></i> Request Refill
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-picture {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.stat-card p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.schedule-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.schedule-item:last-child {
+    border-bottom: none;
+}
+
+.medical-history-content {
+    background: var(--gray-100);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .sidebar {
+        margin-bottom: 2rem;
+    }
+    
+    .profile-picture {
+        width: 100px;
+        height: 100px;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,370 @@
+{% extends 'healthcare/base.html' %}
+{% load static %}
+
+{% block title %}View Reports - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container-fluid reports-page">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar">
+                <div class="text-center mb-4">
+                    {% if user_type == 'Doctor' %}
+                        {% if doctor.profile_picture %}
+                            <img src="{{ doctor.profile_picture.url }}" alt="Profile" class="profile-picture img-fluid rounded-circle border border-3 border-primary">
+                        {% else %}
+                            <img src="https://via.placeholder.com/120" alt="Profile" class="profile-picture img-fluid rounded-circle border border-3 border-primary">
+                        {% endif %}
+                        <h5 class="mt-3">{{ doctor.user.get_full_name }}</h5>
+                        <span class="badge bg-primary">{{ doctor.specialization }}</span>
+                    {% else %}
+                        {% if patient.profile_picture %}
+                            <img src="{{ patient.profile_picture.url }}" alt="Profile" class="profile-picture img-fluid rounded-circle border border-3 border-primary">
+                        {% else %}
+                            <img src="https://via.placeholder.com/120" alt="Profile" class="profile-picture img-fluid rounded-circle border border-3 border-primary">
+                        {% endif %}
+                        <h5 class="mt-3">{{ patient.user.get_full_name }}</h5>
+                        <span class="badge bg-success">Patient</span>
+                    {% endif %}
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#">
+                        <i class="fas fa-file-medical"></i> View Reports
+                    </a>
+                    {% if user_type == 'Doctor' %}
+                        <a class="nav-link" href="{% url 'healthcare:doctor_dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        <a class="nav-link" href="{% url 'healthcare:show_appointments' %}">
+                            <i class="fas fa-calendar-alt"></i> Appointments
+                        </a>
+                        <a class="nav-link" href="{% url 'healthcare:my_patients' %}">
+                            <i class="fas fa-users"></i> My Patients
+                        </a>
+                    {% else %}
+                        <a class="nav-link" href="{% url 'healthcare:patient_dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        <a class="nav-link" href="{% url 'healthcare:book_appointment' %}">
+                            <i class="fas fa-calendar-plus"></i> Book Appointment
+                        </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <!-- Header -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-1">
+                                <i class="fas fa-file-medical text-primary"></i> Medical Reports
+                            </h2>
+                            <p class="text-muted mb-0">
+                                {% if user_type == 'Doctor' %}
+                                    Overview of your practice and patient data
+                                {% else %}
+                                    Your medical history and records
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge fs-6
+                                {% if user_type == 'Doctor' %}bg-primary{% else %}bg-success{% endif %}">
+                                {{ user_type }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if user_type == 'Doctor' %}
+                <!-- Doctor Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="stat-card bg-primary text-white">
+                            <h3><i class="fas fa-users"></i> {{ patients_count }}</h3>
+                            <p>Total Patients</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card bg-success text-white">
+                            <h3><i class="fas fa-calendar-check"></i> {{ appointments|length }}</h3>
+                            <p>Total Appointments</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card bg-info text-white">
+                            <h3><i class="fas fa-pills"></i> {{ prescriptions|length }}</h3>
+                            <p>Prescriptions Issued</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Appointments -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Recent Appointments</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Patient</th>
+                                        <th>Status</th>
+                                        <th>Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in appointments %}
+                                    <tr>
+                                        <td>{{ appointment.appointment_date|date:"M d, Y" }}<br><small class="text-muted">{{ appointment.appointment_time|time:"g:i A" }}</small></td>
+                                        <td>{{ appointment.patient.user.get_full_name }}</td>
+                                        <td>
+                                            <span class="badge
+                                                {% if appointment.status == 'confirmed' %}bg-success
+                                                {% elif appointment.status == 'pending' %}bg-warning text-dark
+                                                {% elif appointment.status == 'cancelled' %}bg-danger
+                                                {% else %}bg-info{% endif %}">
+                                                {{ appointment.status|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ appointment.reason|truncatechars:30 }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">
+                                            No appointments found.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Prescriptions -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-pills"></i> Recent Prescriptions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Patient</th>
+                                        <th>Medication</th>
+                                        <th>Dosage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for prescription in prescriptions %}
+                                    <tr>
+                                        <td>{{ prescription.created_at|date:"M d, Y" }}</td>
+                                        <td>{{ prescription.patient.user.get_full_name }}</td>
+                                        <td>{{ prescription.medication_name }}</td>
+                                        <td>{{ prescription.dosage }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">
+                                            No prescriptions found.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <!-- Patient Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="stat-card bg-success text-white">
+                            <h3><i class="fas fa-calendar-check"></i> {{ appointments|length }}</h3>
+                            <p>Total Appointments</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card bg-info text-white">
+                            <h3><i class="fas fa-pills"></i> {{ prescriptions|length }}</h3>
+                            <p>Active Prescriptions</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card bg-warning text-dark">
+                            <h3><i class="fas fa-notes-medical"></i> 1</h3>
+                            <p>Medical Records</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical History -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-notes-medical"></i> Medical History</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if patient.medical_history %}
+                            <div class="medical-history-content">
+                                <p>{{ patient.medical_history }}</p>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No medical history provided yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Appointments -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Recent Appointments</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Doctor</th>
+                                        <th>Status</th>
+                                        <th>Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in appointments %}
+                                    <tr>
+                                        <td>{{ appointment.appointment_date|date:"M d, Y" }}<br><small class="text-muted">{{ appointment.appointment_time|time:"g:i A" }}</small></td>
+                                        <td>Dr. {{ appointment.doctor.user.get_full_name }}</td>
+                                        <td>
+                                            <span class="badge
+                                                {% if appointment.status == 'confirmed' %}bg-success
+                                                {% elif appointment.status == 'pending' %}bg-warning text-dark
+                                                {% elif appointment.status == 'cancelled' %}bg-danger
+                                                {% else %}bg-info{% endif %}">
+                                                {{ appointment.status|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ appointment.reason|truncatechars:30 }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">
+                                            No appointments found.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Prescriptions -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-pills"></i> Active Prescriptions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Doctor</th>
+                                        <th>Medication</th>
+                                        <th>Dosage</th>
+                                        <th>Instructions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for prescription in prescriptions %}
+                                    <tr>
+                                        <td>{{ prescription.created_at|date:"M d, Y" }}</td>
+                                        <td>Dr. {{ prescription.doctor.user.get_full_name }}</td>
+                                        <td>{{ prescription.medication_name }}</td>
+                                        <td>{{ prescription.dosage }}</td>
+                                        <td>{{ prescription.instructions|truncatechars:40 }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            No prescriptions found.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-picture {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.stat-card p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.medical-history-content {
+    background: var(--gray-100);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+
+    .sidebar {
+        margin-bottom: 2rem;
+    }
+
+    .profile-picture {
+        width: 100px;
+        height: 100px;
+    }
+}
+</style>
+{% endblock %}

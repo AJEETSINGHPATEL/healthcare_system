@@ -1,0 +1,59 @@
+{% extends 'healthcare/base.html' %}
+
+{% block title %}Schedule - HealthCare System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-clock text-primary"></i> My Schedule
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> Schedule management is now available! Use the options below to manage your schedule.
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Weekly Schedule</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Manage your weekly availability and appointment slots.</p>
+                                    <a href="{% url 'healthcare:manage_schedule' %}" class="btn btn-primary">
+                                        <i class="fas fa-calendar-alt"></i> Manage Schedule
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Time Off</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Request time off or mark yourself as unavailable.</p>
+                                    <a href="{% url 'healthcare:request_time_off' %}" class="btn btn-warning">
+                                        <i class="fas fa-plane-departure"></i> Request Time Off
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'healthcare:doctor_dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
